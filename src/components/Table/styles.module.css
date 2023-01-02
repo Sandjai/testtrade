@@ -1,0 +1,54 @@
+.table {
+  min-width: 750px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 340px repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-rows: repeat(8, auto);
+  grid-auto-flow: column;
+  align-items: center;
+}
+
+h3 {
+  text-transform: uppercase;
+  color: var(--light-blue);
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+h4 {
+  font-size: 0.6rem;
+  padding: 0 15px;
+}
+
+.cell {
+  height: 100%;
+  padding: 1px 0px;
+}
+
+.cell_content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.table .cell:nth-of-type(odd),
+tr:nth-of-type(2) {
+  background-color: var(--grey);
+}
+.red {
+  color: var(--red);
+}
+.blue {
+  color: var(--blue);
+}
+
+.green {
+  color: var(--green);
+}
+.red,
+.blue,
+.green {
+  font-weight: 700;
+  font-size: 0.7rem;
+}

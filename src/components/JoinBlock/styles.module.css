@@ -1,0 +1,33 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.root * {
+  margin: 10px 0px;
+}
+
+.btn {
+  background-color: var(--green);
+  border: 1px solid var(--black);
+  color: var(--white);
+  border-radius: 5px;
+  text-transform: uppercase;
+  padding: 20px 0;
+}
+
+.btn:not(:disabled):hover {
+  cursor: pointer;
+  background-color: var(--light-green);
+}
+input {
+  padding: 15px 0;
+  text-align: center;
+}
+
+.btn,
+input {
+  max-width: 300px;
+  width: 100%;
+}
