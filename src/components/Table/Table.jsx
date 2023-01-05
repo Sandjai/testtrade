@@ -45,6 +45,7 @@ export const Table = ({ time, users, roomId }) => {
 
       {users.map((item, index) => (
         <Column
+          key={item + index}
           styles={styles}
           index={index}
           roomId={roomId}

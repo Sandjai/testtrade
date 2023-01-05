@@ -23,8 +23,6 @@ export const JoinBlock = ({ onJoin }) => {
     const config = {
       headers: {
         dataType: "json",
-        "X-Parse-Application-Id": constants.BACK4APP_API_KEY,
-        "X-Parse-REST-API-Key": constants.BACK4APP_REST_API_KEY,
         "Content-Type": "application/json",
       },
     };
