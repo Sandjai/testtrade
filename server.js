@@ -36,7 +36,7 @@ app.get("/rooms/:id", (req, res) => {
         users: getUsers(roomId),
       }
     : {
-        users: getUsers(roomId),
+        users: null,
       };
 
   return res.json(obj);
