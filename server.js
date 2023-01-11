@@ -30,7 +30,6 @@ rooms.set(
     ["timer", startTimer({ roomId: "tradeRoom", index: 0, timeDuration })],
     ["time", Date.now()],
     ["activeUserIndex", 0],
-    ["turn", 0],
   ])
 );
 
@@ -42,12 +41,11 @@ const getUsersEntries = (roomId) => [
 const getTimer = (roomId) => rooms.get(roomId).get("timer");
 const getTime = (roomId) => rooms.get(roomId).get("time");
 const getActiveUserIndex = (roomId) => rooms.get(roomId).get("activeUserIndex");
-const getTurn = (roomId) => rooms.get(roomId).get("turn");
 
 const setTime = (roomId, value) => rooms.get(roomId).set("time", value);
 const setActiveUserIndex = (roomId, value) =>
   rooms.get(roomId).set("activeUserIndex", value);
-const setTurn = (roomId, value) => rooms.get(roomId).set("turn", value);
+
 const setUsers = (roomId, value) => rooms.get(roomId).set("users", value);
 
 app.get("/rooms/:id", (req, res) => {
@@ -129,15 +127,12 @@ io.on("connection", (socket) => {
         if (index === getActiveUserIndex(roomId)) {
           value.get("users").delete(socket.id);
 
-          setTurn(roomId, getTurn(roomId) + 1);
-
           let activeUserIndex = index === getUsers(roomId).length ? 0 : index;
           setTime(roomId, Date.now());
           io.in(roomId).emit("USER/START", {
             activeUserIndex: activeUserIndex,
             time: getTime(roomId),
             totalDuration: timeDuration,
-            turn: getTurn(roomId),
           });
           setActiveUserIndex(roomId, activeUserIndex);
         } else {
@@ -177,10 +172,8 @@ function startTimer({ roomId, index = 0, timeDuration }) {
     io.in(roomId).emit("USER/START", {
       activeUserIndex: index,
       time: getTime(roomId),
-      turn: getTurn(roomId),
+
       totalDuration: timeDuration,
     });
-
-    setTurn(roomId, getTurn(roomId) + 1);
   }, timeDuration * 1000);
 }
