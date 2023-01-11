@@ -1,30 +1,32 @@
 import classNames from "classnames";
+import { useEffect } from "react";
+import socket from "../../socket";
+
 import { Timer } from "../../Timer/Timer";
 
 export const Column = ({
   styles,
   index,
   children,
-  roomId,
   activeInd,
-  setActiveInd,
   timer,
-  setTimer,
+  roomId,
 }) => {
+  useEffect(() => {
+    socket.on("ROOM/GETTIME", (socketId) => {
+      const obj = {
+        roomId,
+        time: Date.now(),
+        socketId,
+      };
+      socket.emit("ROOM/SETTIME", obj);
+    });
+  }, []);
+
   return (
     <>
       <div className={styles.turn}>
-        {activeInd === index ? (
-          <Timer
-            index={index}
-            roomId={roomId}
-            setActiveInd={setActiveInd}
-            timer={timer}
-            setTimer={setTimer}
-          ></Timer>
-        ) : (
-          ""
-        )}
+        {activeInd === index ? <Timer timer={timer}></Timer> : ""}
       </div>
       <div className={styles.hero}>
         <h3>

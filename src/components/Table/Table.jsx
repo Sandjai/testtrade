@@ -2,14 +2,32 @@ import { useEffect, useState } from "react";
 import socket from "../socket";
 import { Column } from "./Column/Column";
 import styles from "./styles.module.css";
-export const Table = ({ time, users, roomId }) => {
+export const Table = ({ users, roomId }) => {
   const [activeInd, setActiveInd] = useState();
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
-    socket.on("USER/START", ({ activeUserIndex, time }) => {
+    socket.on("USER/START", ({ activeUserIndex, time, totalDuration }) => {
       setActiveInd(activeUserIndex);
-      setTimer(time);
+
+      setTimer(totalDuration);
+    });
+
+    socket.on("USER/FIRSTSTART", ({ activeUserIndex, time, totalDuration }) => {
+      setActiveInd(activeUserIndex);
+
+      const secondsPassed = (Date.now() - time) / 1000;
+
+      const currentTimerTime =
+        totalDuration - (secondsPassed % totalDuration)
+          ? totalDuration - (secondsPassed % totalDuration)
+          : secondsPassed;
+      /*        secondsPassed % totalDuration
+          ? secondsPassed % totalDuration
+          : secondsPassed;
+          */
+      console.log("currentTimerTime" + currentTimerTime);
+      setTimer(Math.round(currentTimerTime));
     });
   }, []);
 
@@ -50,11 +68,9 @@ export const Table = ({ time, users, roomId }) => {
           index={index}
           roomId={roomId}
           activeInd={activeInd}
-          setActiveInd={setActiveInd}
-          setTimer={setTimer}
           timer={timer}
         >
-          {item}
+          {item ? item : "No name"}
         </Column>
       ))}
     </div>

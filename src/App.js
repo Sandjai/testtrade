@@ -10,7 +10,6 @@ function App() {
     joined: false,
     roomId: null,
     userName: null,
-    time: null,
     users: [],
   });
 

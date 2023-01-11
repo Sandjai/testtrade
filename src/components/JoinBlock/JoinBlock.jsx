@@ -1,23 +1,20 @@
 import styles from "./styles.module.css";
-import { constants } from "../constants";
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
 
 export const JoinBlock = ({ onJoin }) => {
-  const [roomId, setRoomId] = useState("");
+  // roomId использовать, если нужны разные комнаты
+  // const [roomId, setRoomId] = useState("");
+  const roomId = "tradeRoom";
+
   const [userName, setUserName] = useState("");
   const [isLoading, setLoading] = useState(false);
 
   const onEnter = () => {
-    if (!roomId || !userName) {
-      console.error("no data");
-    }
-
     const obj = {
       roomId,
       userName,
-      time: Date.now(),
     };
 
     const config = {
@@ -29,6 +26,7 @@ export const JoinBlock = ({ onJoin }) => {
 
     setLoading(true);
     axios
+      // .post("http://84.252.131.248:8000/rooms", obj, config)
       .post("/rooms", obj, config)
       .then((res) => {
         onJoin(obj);
@@ -41,7 +39,9 @@ export const JoinBlock = ({ onJoin }) => {
 
   return (
     <div className={styles.root}>
-      <input
+      {
+        // roomId использовать, если нужны разные комнаты
+        /*  <input
         type="text"
         placeholder="Room ID"
         name="roomid"
@@ -50,6 +50,9 @@ export const JoinBlock = ({ onJoin }) => {
           setRoomId(event.target.value);
         }}
       />
+      */
+      }
+
       <input
         type="text"
         placeholder="Компания"
@@ -59,6 +62,7 @@ export const JoinBlock = ({ onJoin }) => {
           setUserName(event.target.value);
         }}
       />
+
       <button
         disabled={isLoading}
         className={styles.btn}
