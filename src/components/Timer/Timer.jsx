@@ -3,11 +3,10 @@ import styles from "./styles.module.css";
 import { ReactComponent as ClockIcon } from "./images/clock.svg";
 import classNames from "classnames";
 import { getPadTime } from "./../utils/getPadTime";
+import socket from "../socket";
 
 export const Timer = ({ timer, className }) => {
   const [time, setTime] = useState(timer);
-
-  console.log("I am timer:" + time + " timer2 :" + timer);
 
   useEffect(() => {
     const interval = setInterval(() => {

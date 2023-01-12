@@ -14,7 +14,7 @@ const io = require("socket.io")(server, {
 
 app.use(express.json());
 
-const timeDuration = 120; //('Время в секундах на один ход игрока')
+const timeDuration = 20; //('Время в секундах на один ход игрока')
 const rooms = new Map();
 
 const testBots = new Map();
@@ -34,15 +34,20 @@ rooms.set(
 );
 
 const getUsers = (roomId) => [...rooms.get(roomId).get("users").values()];
-const getUsersEntries = (roomId) => [
-  ...rooms.get(roomId).get("users").entries(),
-];
 
 const getTimer = (roomId) => rooms.get(roomId).get("timer");
 const getTime = (roomId) => rooms.get(roomId).get("time");
 const getActiveUserIndex = (roomId) => rooms.get(roomId).get("activeUserIndex");
 
-const setTime = (roomId, value) => rooms.get(roomId).set("time", value);
+const setTime = (roomId, value) => {
+  return rooms.get(roomId).set("time", value);
+};
+const setTimer = (roomId, activeUserIndex) => {
+  rooms
+    .get(roomId)
+    .set("timer", startTimer({ roomId, index: activeUserIndex, timeDuration }));
+};
+
 const setActiveUserIndex = (roomId, value) =>
   rooms.get(roomId).set("activeUserIndex", value);
 
@@ -95,24 +100,6 @@ io.on("connection", (socket) => {
       time: getTime(roomId),
       totalDuration: timeDuration,
     });
-
-    const activeSocketId =
-      // Два бота, поэтому спрашиваем первого пользователя (индекс 3)
-      // При наличии всех настоящих пользователей, можно опрашивать по индексу getActiveUserIndex(roomId)
-      getUsersEntries(roomId)[getActiveUserIndex(roomId)][0];
-
-    io.to(activeSocketId).emit("ROOM/GETTIME", { socketId: socket.id });
-  });
-
-  socket.on("ROOM/SETTIME", ({ roomId, time, socketId }) => {
-    console.log("ROOM/SETTIME " + roomId + " " + time);
-    setTime(roomId, time);
-
-    io.to(socketId).emit("USER/START", {
-      time,
-      activeUserIndex: getActiveUserIndex(roomId),
-      totalDuration: timeDuration,
-    });
   });
 
   socket.on("disconnect", () => {
@@ -128,10 +115,12 @@ io.on("connection", (socket) => {
           value.get("users").delete(socket.id);
 
           let activeUserIndex = index === getUsers(roomId).length ? 0 : index;
+          clearInterval(getTimer(roomId));
           setTime(roomId, Date.now());
+          setTimer(roomId, activeUserIndex);
+
           io.in(roomId).emit("USER/START", {
             activeUserIndex: activeUserIndex,
-            time: getTime(roomId),
             totalDuration: timeDuration,
           });
           setActiveUserIndex(roomId, activeUserIndex);
@@ -169,10 +158,10 @@ function startTimer({ roomId, index = 0, timeDuration }) {
 
     setActiveUserIndex(roomId, index);
 
+    setTime(roomId, Date.now());
+
     io.in(roomId).emit("USER/START", {
       activeUserIndex: index,
-      time: getTime(roomId),
-
       totalDuration: timeDuration,
     });
   }, timeDuration * 1000);

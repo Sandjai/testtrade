@@ -2,17 +2,20 @@ import { useEffect, useState } from "react";
 import socket from "../socket";
 import { Column } from "./Column/Column";
 import styles from "./styles.module.css";
-export const Table = ({ users, roomId }) => {
+import { nanoid } from "nanoid";
+export const Table = ({ users, roomId, time }) => {
   const [activeInd, setActiveInd] = useState();
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
-    socket.on("USER/START", ({ activeUserIndex, time, totalDuration }) => {
+    socket.on("USER/START", ({ activeUserIndex, totalDuration }) => {
       setActiveInd(activeUserIndex);
 
       setTimer(totalDuration);
     });
+  }, []);
 
+  useEffect(() => {
     socket.on("USER/FIRSTSTART", ({ activeUserIndex, time, totalDuration }) => {
       setActiveInd(activeUserIndex);
 
@@ -22,11 +25,7 @@ export const Table = ({ users, roomId }) => {
         totalDuration - (secondsPassed % totalDuration)
           ? totalDuration - (secondsPassed % totalDuration)
           : secondsPassed;
-      /*        secondsPassed % totalDuration
-          ? secondsPassed % totalDuration
-          : secondsPassed;
-          */
-      console.log("currentTimerTime" + currentTimerTime);
+
       setTimer(Math.round(currentTimerTime));
     });
   }, []);
@@ -63,7 +62,7 @@ export const Table = ({ users, roomId }) => {
 
       {users.map((item, index) => (
         <Column
-          key={item + index}
+          key={nanoid()}
           styles={styles}
           index={index}
           roomId={roomId}
