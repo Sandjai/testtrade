@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
     io.in(roomId).emit("ROOM/SET_USERS", getUsers(roomId));
     console.log("Пользователь вошёл", socket.id);
 
-    io.in(roomId).emit("USER/FIRSTSTART", {
+    io.to(socket.id).emit("USER/FIRSTSTART", {
       activeUserIndex: getActiveUserIndex(roomId),
       time: getTime(roomId),
       totalDuration: timeDuration,
@@ -107,28 +107,26 @@ io.on("connection", (socket) => {
 
     rooms.forEach((value, roomId) => {
       if (value.get("users").has(socket.id)) {
-        const index = getUsers(roomId).indexOf(
-          value.get("users").get(socket.id)
-        );
+        let index = getUsers(roomId).indexOf(value.get("users").get(socket.id));
+
+        value.get("users").delete(socket.id);
+        setUsers(roomId, value.get("users"));
 
         if (index === getActiveUserIndex(roomId)) {
-          let activeUserIndex =
-            index === getUsers(roomId).length - 1 ? 0 : index;
-          value.get("users").delete(socket.id);
+          if (index === getUsers(roomId).length - 1) {
+            index = 0;
+          }
+
           clearInterval(getTimer(roomId));
           setTime(roomId, Date.now());
-          setTimer(roomId, activeUserIndex);
+          setTimer(roomId, index);
 
           io.in(roomId).emit("USER/START", {
-            activeUserIndex: activeUserIndex,
+            activeUserIndex: index,
             totalDuration: timeDuration,
           });
-          setActiveUserIndex(roomId, activeUserIndex);
-        } else {
-          value.get("users").delete(socket.id);
+          setActiveUserIndex(roomId, index);
         }
-
-        setUsers(roomId, value.get("users"));
 
         if (getUsers(roomId).length === 0) {
           clearInterval(getTimer(roomId));
@@ -161,7 +159,7 @@ function startTimer({ roomId, index = 0, timeDuration }) {
     setTime(roomId, Date.now());
 
     io.in(roomId).emit("USER/START", {
-      activeUserIndex: index,
+      activeUserIndex: getActiveUserIndex(roomId),
       totalDuration: timeDuration,
     });
   }, timeDuration * 1000);

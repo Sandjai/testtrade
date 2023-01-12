@@ -36,7 +36,7 @@ function App() {
   return (
     <>
       {!state.joined ? (
-        <JoinBlock onJoin={onJoin} />
+        <JoinBlock onJoin={onJoin} setUsers={setUsers} users={state.users} />
       ) : (
         <Table {...state}></Table>
       )}
