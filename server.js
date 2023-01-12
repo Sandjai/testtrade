@@ -112,9 +112,9 @@ io.on("connection", (socket) => {
         );
 
         if (index === getActiveUserIndex(roomId)) {
+          let activeUserIndex =
+            index === getUsers(roomId).length - 1 ? 0 : index;
           value.get("users").delete(socket.id);
-
-          let activeUserIndex = index === getUsers(roomId).length ? 0 : index;
           clearInterval(getTimer(roomId));
           setTime(roomId, Date.now());
           setTimer(roomId, activeUserIndex);
